@@ -23,17 +23,15 @@ module.exports = {
   plugins: ['react', 'prettier'],
   parser: 'babel-eslint',
   rules: {
+    'react/prop-types': 0,
     'prettier/prettier': 'error',
     'react/jsx-filename-extension': 0,
     'react/jsx-curly-spacing': [0, 'never'],
     'react/jsx-indent': [0, 2],
     'arrow-parens': [0, 'as-needed'],
-    // allow console and debugger in development
+    'react/jsx-props-no-spreading': 0,
+
     'no-console': process.env.NODE_ENV === 'production' ? 2 : 0,
     'no-debugger': process.env.NODE_ENV === 'production' ? 2 : 0,
-    // 'react/jsx-one-expression-per-line': [
-    //   0,
-    //   { allow: 'none' | 'literal' | 'single-child' },
-    // ],
   },
 };

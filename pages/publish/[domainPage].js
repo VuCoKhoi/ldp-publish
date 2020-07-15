@@ -1,12 +1,12 @@
 import React from 'react';
 import { useMediaQuery } from '@material-ui/core';
 
-import Query from '../src/apollo/Query';
-import withApollo from '../src/apollo/withApollo';
-import Header from '../src/render-page/Header';
-import RenderPage from '../src/render-page';
+import Query from '../../src/apollo/Query';
+import withApollo from '../../src/apollo/withApollo';
+import Header from '../../src/render-page/Header';
+import RenderPage from '../../src/render-page';
 
-function Home({ mobile, desktop, setting, isMobile }) {
+function Page({ mobile, desktop, setting, isMobile }) {
   const matchMobile = useMediaQuery('(max-width:750px)');
   return (
     <>
@@ -20,7 +20,7 @@ function Home({ mobile, desktop, setting, isMobile }) {
   );
 }
 
-Home.getInitialProps = async ({ apolloClient, req, query }) => {
+Page.getInitialProps = async ({ apolloClient, req, query }) => {
   const userAgent = req ? req.headers['user-agent'] : navigator.userAgent;
   const isMobile = Boolean(
     userAgent.match(
@@ -29,13 +29,13 @@ Home.getInitialProps = async ({ apolloClient, req, query }) => {
   );
 
   const { data, error } = await apolloClient.query({
-    query: Query.GET_DATA_PAGE_BY_CUSTOM_DOMAIN,
+    query: Query.GET_DATA_PAGE_BY_DOMAIN,
     variables: {
-      custom_domain: req.headers.host,
+      domain: query.domainPage,
     },
   });
 
-  return { ...data.getDataPagePublishCustomDomain, error, isMobile };
+  return { ...data.getDataPagePublishDomain, error, isMobile };
 };
 
-export default withApollo({ ssr: true })(Home);
+export default withApollo({ ssr: true })(Page);

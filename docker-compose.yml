@@ -1,0 +1,13 @@
+version: '2.1'
+
+services:
+  ldp-publish:
+    image: ldp-publish:1.0
+    build: .
+    ports:
+      - 5002:5001
+    restart: always
+    environment:
+      - PORT=${PORT}
+      - NODE_ENV=${NODE_ENV}
+      - MIX_LDP_GATEWAY=${MIX_LDP_GATEWAY}

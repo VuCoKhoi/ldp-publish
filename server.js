@@ -1,6 +1,10 @@
 const express = require('express');
 const next = require('next');
 const LRUCache = require('lru-cache');
+const path = require('path');
+const compression = require('compression');
+
+require('dotenv').config();
 
 const port = parseInt(process.env.PORT, 10) || 3000;
 const dev = process.env.NODE_ENV !== 'production';
@@ -16,7 +20,7 @@ const ssrCache = new LRUCache({
   length(n) {
     return n.length;
   },
-  maxAge: 1000 * 60 * 60 * 24 * 30,
+  maxAge: 1000 * 60,
 });
 
 /*
@@ -24,14 +28,20 @@ const ssrCache = new LRUCache({
  * an immediate page change (e.g a locale stored in req.session)
  */
 function getCacheKey(req) {
-  return `${req.path}`;
+  const userAgent = req ? req.headers['user-agent'] : navigator.userAgent;
+  const isMobile = Boolean(
+    userAgent.match(
+      /Android|BlackBerry|iPhone|iPad|iPod|Opera Mini|IEMobile|WPDesktop/i,
+    ),
+  );
+
+  return `${req.headers.host}${req.path}${isMobile}`;
 }
 
 async function renderAndCache(req, res) {
   const key = getCacheKey(req);
-
   // If we have a page in the cache, let's serve it
-  if (ssrCache.has(key)) {
+  if (ssrCache.has(key) && process.env.NODE_ENV === 'production') {
     // console.log(`serving from cache ${key}`);
     res.setHeader('x-cache', 'HIT');
     res.send(ssrCache.get(key));
@@ -61,6 +71,13 @@ async function renderAndCache(req, res) {
 
 app.prepare().then(() => {
   const server = express();
+  server.use(compression());
+
+  server.get('/favicon.ico', (req, res) =>
+    res
+      .status(200)
+      .sendFile('favicon.ico', { root: path.join(__dirname, '/static/') }),
+  );
 
   server.get('/_next/*', (req, res) => {
     /* serving _next static content using next.js handler */

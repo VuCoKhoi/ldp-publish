@@ -1,10 +1,11 @@
 import { useEffect } from 'react';
 
-function useBlockIframe() {
+function withBlockIframe(Comp) {
   useEffect(() => {
     if (window.top !== window.self)
       window.top.location.replace(window.self.location.href);
   }, []);
+  return Comp;
 }
 
-export default useBlockIframe;
+export default withBlockIframe;
